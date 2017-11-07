@@ -1,0 +1,2 @@
+include ':app', ':trailedsheet'
+project(':trailedsheet').projectDir = new File('trailedsheets')
