@@ -6,10 +6,10 @@
 
 ```
 allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
 }
 ```
 
@@ -28,12 +28,12 @@ In XML(Init):
 
 ```
 <com.tabbara.mohammad.trailedsheet.TrailedSheet
-        android:id="@+id/trailed_sheet"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#FF0000">
-        ...
-    </com.tabbara.mohammad.trailedsheet.TrailedSheet>
+    android:id="@+id/trailed_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF0000">
+    ...
+</com.tabbara.mohammad.trailedsheet.TrailedSheet>
 ```
 
 TouchEvents:
