@@ -17,14 +17,14 @@ allprojects {
 
 ```
 dependencies {
-		compile 'com.github.mohammad-tabbara:trailedsheet:0.0.2'
+	compile 'com.github.mohammad-tabbara:trailedsheet:0.0.2'
 }
 ```
 
 
-##Usage
+## Usage
 
-In XML(Init):
+### In XML(Init):
 
 ```
 <com.tabbara.mohammad.trailedsheet.TrailedSheet
@@ -36,11 +36,11 @@ In XML(Init):
 </com.tabbara.mohammad.trailedsheet.TrailedSheet>
 ```
 
-TouchEvents:
+### TouchEvents:
 
 Coming Soon
 
-In Code(Methods):
+### In Code(Methods):
 
 ```
 trailedSheet.lock(); //Disables TouchEvents(Parent and Children)
@@ -51,6 +51,6 @@ trailedSheet.moveDown(); // animates movedown and triggers actionController down
 ```
 
 
-##Future work
+## Future work
 
 Coming Soon
