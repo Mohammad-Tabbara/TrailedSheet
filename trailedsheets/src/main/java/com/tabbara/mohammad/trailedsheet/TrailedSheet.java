@@ -77,9 +77,9 @@ public class TrailedSheet extends RelativeLayout {
 
     /**
      * Initialization
-     * @param context
-     * @param attr
-     * @param defStyle
+     * @param context The Activity context
+     * @param attr The RelativeView attributes
+     * @param defStyle The Defined Style
      */
 
     private void init(Context context, AttributeSet attr, int defStyle){
@@ -95,8 +95,8 @@ public class TrailedSheet extends RelativeLayout {
 
     /**
      * Lock Touch of child Views
-     * @param ev
-     * @return
+     * @param ev Child Related Events
+     * @return true if locked
      */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -106,6 +106,12 @@ public class TrailedSheet extends RelativeLayout {
             return true;
         }
     }
+
+    /**
+     * Handle Touch of parent View.
+     * @param event Parent Related Events
+     * @return true if locked
+     */
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -138,33 +144,35 @@ public class TrailedSheet extends RelativeLayout {
                 case (MotionEvent.ACTION_CANCEL):
                     if ((mMinFlingVelocity <= Math.abs(velocityY) && Math.abs(velocityY) <= mMaxFlingVelocity && this.getY()<-getHeight() / 20)||getY() < -getHeight() / 2) {
                         if(actionController != null) {
-                            this.lock();
                             actionController.exitUp(getId());
                             animationController.animateOnExitUp(getId());
                         }
                         this.animate()
                                 .translationY(-getHeight())
+                                .setListener(null)
                                 .setDuration(400) //400
                                 .start();
                     } else if ((mMinFlingVelocity <= Math.abs(velocityY) && Math.abs(velocityY) <= mMaxFlingVelocity && this.getY()>getHeight() / 20)||getY() > getHeight() / 2) {
                         if(actionController != null) {
-                            this.lock();
                             actionController.exitDown(getId());
                             animationController.animateOnExitDown(getId());
                         }
                         this.animate()
                                 .translationY(getHeight())
+                                .setListener(null)
                                 .setDuration(400)//400
                                 .start();
                     } else {
                         if (getY() < 0) {
                             this.animate()
                                     .translationY(0)
+                                    .setListener(null)
                                     .setDuration(300)
                                     .start();
                         } else {
                             this.animate()
                                     .translationY(0)
+                                    .setListener(null)
                                     .setDuration(300)
                                     .start();
                         }
@@ -249,7 +257,9 @@ public class TrailedSheet extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-//                ((Activity)getContext()).finish();
+                if(actionController != null) {
+                    actionController.exitUp(getId());
+                }
             }
 
             @Override
@@ -264,7 +274,9 @@ public class TrailedSheet extends RelativeLayout {
         }).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-
+                if(actionController != null) {
+                    animationController.animateOnExitUp(getId());
+                }
             }
         });
     }
@@ -285,7 +297,9 @@ public class TrailedSheet extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-//                ((Activity) getContext()).finish();
+                if(actionController != null) {
+                    actionController.exitDown(getId());
+                }
             }
 
             @Override
@@ -300,15 +314,17 @@ public class TrailedSheet extends RelativeLayout {
         }).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-
+                if(animationController != null){
+                    animationController.animateOnExitDown(getId());
+                }
             }
         });
     }
 
     /**
      * set ActionController Interface
-     * @param actionController
-     * @return
+     * @param actionController Action Related Control
+     * @return this
      */
     public TrailedSheet setActionController(ActionController actionController){
         this.actionController = actionController;
@@ -317,8 +333,8 @@ public class TrailedSheet extends RelativeLayout {
 
     /**
      * Set AnimationController Interface
-     * @param animationController
-     * @return
+     * @param animationController Animation Related Control
+     * @return this
      */
     public TrailedSheet setAnimationController(AnimationController animationController){
         this.animationController = animationController;
@@ -332,6 +348,7 @@ public class TrailedSheet extends RelativeLayout {
     public void reset(boolean animated){
         if(animated){
             animate().translationY(defaultY)
+                    .setListener(null)
                     .setDuration(400)
                     .start();
         }else{

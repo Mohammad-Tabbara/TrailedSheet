@@ -17,6 +17,33 @@
         android:layout_height="match_parent"
         android:background="#FF0000"
         android:elevation="4dp">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+            <TextView
+                android:id="@+id/rg_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="Animated Reset:"/>
+            <RadioGroup
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rg_title"
+                android:layout_centerHorizontal="true">
+                <RadioButton
+                    android:id="@+id/animation_on"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="On" />
+                <RadioButton
+                    android:id="@+id/animation_off"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Off"/>
+            </RadioGroup>
+        </RelativeLayout>
         <Button
             android:id="@+id/move_up"
             android:layout_width="wrap_content"
