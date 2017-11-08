@@ -13,7 +13,7 @@ allprojects {
 }
 ```
 
-1. Add the dependency in app(build.gradle):
+2. Add the dependency in app(build.gradle):
 
 ```
 dependencies {
