@@ -34,6 +34,7 @@ public class TrailedSheet extends RelativeLayout {
     private AnimationController animationController;
 
     //Position Values
+    private float defaultY = 0;
     private float startY = 0;
     private float endYP1 = 0;
     private float endYP2 = 0;
@@ -87,6 +88,9 @@ public class TrailedSheet extends RelativeLayout {
         mSlop = vc.getScaledTouchSlop();
         mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
         mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
+
+        //Default position Init
+        defaultY = getY();
     }
 
     /**
@@ -126,8 +130,8 @@ public class TrailedSheet extends RelativeLayout {
 //                    if (Math.abs(deltaY) > mSlop) {
                         endUnixTime = new Date().getTime();
                         velocityY = deltaY/((endUnixTime-startUnixTime)/100);
-                        Log.d(DEBUG_TAG,"Delta: "+deltaY);
-                        Log.d(DEBUG_TAG,velocityY+"");
+//                        Log.d(DEBUG_TAG,"Delta: "+deltaY);
+//                        Log.d(DEBUG_TAG,velocityY+"");
 //                    }
                     return true;
                 case (MotionEvent.ACTION_UP):
@@ -140,7 +144,7 @@ public class TrailedSheet extends RelativeLayout {
                         }
                         this.animate()
                                 .translationY(-getHeight())
-                                .setDuration(150) //400
+                                .setDuration(400) //400
                                 .start();
                     } else if ((mMinFlingVelocity <= Math.abs(velocityY) && Math.abs(velocityY) <= mMaxFlingVelocity && this.getY()>getHeight() / 20)||getY() > getHeight() / 2) {
                         if(actionController != null) {
@@ -150,7 +154,7 @@ public class TrailedSheet extends RelativeLayout {
                         }
                         this.animate()
                                 .translationY(getHeight())
-                                .setDuration(150)//400
+                                .setDuration(400)//400
                                 .start();
                     } else {
                         if (getY() < 0) {
@@ -233,6 +237,7 @@ public class TrailedSheet extends RelativeLayout {
      * Animate a push up Event
      * And give user the ability to handle
      */
+
     public void moveUp(){
         this.animate()
                 .translationY(-getHeight())
@@ -244,7 +249,7 @@ public class TrailedSheet extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                ((Activity)getContext()).finish();
+//                ((Activity)getContext()).finish();
             }
 
             @Override
@@ -259,9 +264,16 @@ public class TrailedSheet extends RelativeLayout {
         }).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
+
             }
         });
     }
+
+    /**
+     * Animate a push down Event
+     * And give user the ability to handle
+     */
+
     public void moveDown(){
         this.animate()
                 .translationY(getHeight())
@@ -273,7 +285,7 @@ public class TrailedSheet extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                ((Activity) getContext()).finish();
+//                ((Activity) getContext()).finish();
             }
 
             @Override
@@ -288,6 +300,7 @@ public class TrailedSheet extends RelativeLayout {
         }).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
+
             }
         });
     }
@@ -312,4 +325,17 @@ public class TrailedSheet extends RelativeLayout {
         return this;
     }
 
+    /**
+     * Reset To default Position
+     */
+
+    public void reset(boolean animated){
+        if(animated){
+            animate().translationY(defaultY)
+                    .setDuration(400)
+                    .start();
+        }else{
+            setY(defaultY);
+        }
+    }
 }

@@ -1,16 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.tabbara.mohammad.trailedsheetexample.MainActivity">
-
+    <Button
+        android:id="@+id/reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Reset"/>
     <com.tabbara.mohammad.trailedsheet.TrailedSheet
+        android:id="@+id/trailed_sheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FF0000">
-
+        android:background="#FF0000"
+        android:elevation="4dp">
+        <Button
+            android:id="@+id/move_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="v"/>
+        <Button
+            android:id="@+id/move_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:text="v"/>
     </com.tabbara.mohammad.trailedsheet.TrailedSheet>
 
-</RelativeLayout>
+</FrameLayout>
