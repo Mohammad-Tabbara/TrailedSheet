@@ -1,5 +1,7 @@
 # TrailedSheet
 
+[![](https://jitpack.io/v/Mohammad-Tabbara/TrailedSheet.svg)](https://jitpack.io/#Mohammad-Tabbara/TrailedSheet)
+
 ## Download
 
 1. Add the repositories is root(build.gradle):
@@ -17,7 +19,7 @@ allprojects {
 
 ```
 dependencies {
-	compile 'com.github.mohammad-tabbara:trailedsheet:0.0.2'
+	compile 'com.github.mohammad-tabbara:trailedsheet:0.0.5'
 }
 ```
 
