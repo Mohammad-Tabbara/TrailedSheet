@@ -133,16 +133,17 @@ public class TrailedSheet extends RelativeLayout {
                         animationController.animateOnDrag(getId());
                     }
                     float deltaY = event.getRawY() - startY;
-//                    if (Math.abs(deltaY) > mSlop) {
+                    float deltaT = ((endUnixTime-startUnixTime)/100)>0.01 ? ((endUnixTime-startUnixTime)/100) : (float) 0.01;
+                    if (Math.abs(deltaY) > mSlop) {
                         endUnixTime = new Date().getTime();
-                        velocityY = deltaY/((endUnixTime-startUnixTime)/100);
+                        velocityY = deltaY/deltaT;
 //                        Log.d(DEBUG_TAG,"Delta: "+deltaY);
 //                        Log.d(DEBUG_TAG,velocityY+"");
-//                    }
+                    }
                     return true;
                 case (MotionEvent.ACTION_UP):
                 case (MotionEvent.ACTION_CANCEL):
-                    if ((mMinFlingVelocity <= Math.abs(velocityY) && Math.abs(velocityY) <= mMaxFlingVelocity && this.getY()<-getHeight() / 20)||getY() < -getHeight() / 2) {
+                    if ((mMinFlingVelocity <= Math.abs(velocityY) && Math.abs(velocityY) <= mMaxFlingVelocity && this.getY()<0)||getY() < -getHeight() / 2) {
                         if(actionController != null) {
                             actionController.exitUp(getId());
                             animationController.animateOnExitUp(getId());
@@ -152,7 +153,7 @@ public class TrailedSheet extends RelativeLayout {
                                 .setListener(null)
                                 .setDuration(400) //400
                                 .start();
-                    } else if ((mMinFlingVelocity <= Math.abs(velocityY) && Math.abs(velocityY) <= mMaxFlingVelocity && this.getY()>getHeight() / 20)||getY() > getHeight() / 2) {
+                    } else if ((mMinFlingVelocity <= Math.abs(velocityY) && Math.abs(velocityY) <= mMaxFlingVelocity && this.getY()>0)||getY() > getHeight() / 2) {
                         if(actionController != null) {
                             actionController.exitDown(getId());
                             animationController.animateOnExitDown(getId());
