@@ -47,8 +47,8 @@ Coming Soon
 trailedSheet.lock(); //Disables TouchEvents(Parent and Children)
 trailedSheet.unlock(); //Enables TouchEvents(Parent and Children)
 trailedSheet.unlocked(); //Check Lock Status
-trailedSheet.moveUp(); // animates moveup and triggers actionController Up
-trailedSheet.moveDown(); // animates movedown and triggers actionController down
+trailedSheet.moveUp(); // animates moveup and triggers eventListener Up
+trailedSheet.moveDown(); // animates movedown and triggers eventListener down
 ```
 
 

@@ -7,11 +7,10 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.tabbara.mohammad.trailedsheet.ActionController;
-import com.tabbara.mohammad.trailedsheet.AnimationController;
+import com.tabbara.mohammad.trailedsheet.TrailedSheetListeners;
 import com.tabbara.mohammad.trailedsheet.TrailedSheet;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, AnimationController, ActionController {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, TrailedSheetListeners.EventListener {
 
     private TrailedSheet trailedSheet;
     private boolean isAnimated;
@@ -27,8 +26,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RadioButton animatedOn = findViewById(R.id.animation_on);
         RadioButton animatedOff = findViewById(R.id.animation_off);
         animatedOn.toggle();
-        trailedSheet.setActionController(this);
-        trailedSheet.setAnimationController(this);
+        trailedSheet.addEventListener(this);
         reset.setOnClickListener(this);
         moveUp.setOnClickListener(this);
         moveUp.setRotation(180);
@@ -62,37 +60,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
-
-    @Override
-    public void exitUp(int id) {
+    public void onExitUp(int id) {
         Toast.makeText(this,"Up",Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void exitDown(int id) {
+    public void onExitDown(int id) {
         Toast.makeText(this,"Down",Toast.LENGTH_LONG).show();
     }
 
-    @Override
-    public void animateOnExitUp(int id) {
-
-    }
-
-    @Override
-    public void animateOnExitDown(int id) {
-
-    }
-
-    @Override
-    public void animateOnDrag(int id) {
-
-    }
-
-    @Override
-    public void animateOnUp(int id) {
-
-    }
 }

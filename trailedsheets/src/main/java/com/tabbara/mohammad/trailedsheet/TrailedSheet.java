@@ -2,19 +2,16 @@ package com.tabbara.mohammad.trailedsheet;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v4.view.MotionEventCompat;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.ViewConfiguration;
-import android.widget.RelativeLayout;
 
-import java.util.Date;
+import android.support.annotation.RequiresApi;
+import android.support.v4.view.GestureDetectorCompat;
+import android.util.AttributeSet;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.MotionEvent;
+import android.widget.RelativeLayout;
 
 /**
  * Created by Espfish on 11/6/2017.
@@ -30,25 +27,49 @@ public class TrailedSheet extends RelativeLayout {
     private boolean unlocked = true;
 
     //Interfaces
-    private ActionController actionController;
-    private AnimationController animationController;
+    private TrailedSheetListeners.EventListener eventListener;
+    private TrailedSheetListeners.DragListener dragListener;
+    private TrailedSheetListeners.ReleaseListener releaseListener;
+    private TrailedSheetListeners.WhileAnimatingListener whileAnimating;
 
     //Position Values
     private float defaultY = 0;
     private float startY = 0;
+    private float tempYP1 = 0;
     private float endYP1 = 0;
     private float endYP2 = 0;
     private float diff = 0;
     private float position = 0;
 
-    //Fling Values
-    private ViewConfiguration vc;
-    private int mSlop;
-    private int mMinFlingVelocity;
-    private int mMaxFlingVelocity;
-    private double velocityY;
-    private long startUnixTime;
-    private long endUnixTime;
+    GestureDetectorCompat gestureDetectorCompat;
+    SimpleOnGestureListener simpleOnGestureListener = new SimpleOnGestureListener(){
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if(tempYP1 < endYP2){
+                lock();
+                moveDown(200);
+                return false;
+            }
+            if(tempYP1 > endYP2){
+                lock();
+                moveUp(200);
+                return false;
+            }
+            return super.onFling(e1, e2, velocityX, velocityY);
+        }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            return true;
+        }
+    };
+
+
 
     /**
      * Constructors
@@ -83,12 +104,8 @@ public class TrailedSheet extends RelativeLayout {
      */
 
     private void init(Context context, AttributeSet attr, int defStyle){
-        //Fling Init
-        vc = ViewConfiguration.get(context);
-        mSlop = vc.getScaledTouchSlop();
-        mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
-        mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
 
+        gestureDetectorCompat = new GestureDetectorCompat(context,simpleOnGestureListener);
         //Default position Init
         defaultY = getY();
     }
@@ -103,7 +120,7 @@ public class TrailedSheet extends RelativeLayout {
         if(unlocked) {
             return super.onInterceptTouchEvent(ev);
         }else{
-            return true;
+            return false;
         }
     }
 
@@ -116,46 +133,37 @@ public class TrailedSheet extends RelativeLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(unlocked) {
-            int action = MotionEventCompat.getActionMasked(event);
+            int action = event.getActionMasked();
             switch (action) {
-                case (MotionEvent.ACTION_DOWN):
-                    startUnixTime = new Date().getTime();
+                case MotionEvent.ACTION_DOWN:
                     startY = event.getRawY();
                     endYP1 = event.getRawY();
-                    return true;
-                case (MotionEvent.ACTION_MOVE):
+                    break;
+                case MotionEvent.ACTION_MOVE:
                     endYP2 = event.getRawY();
                     diff = endYP2 - endYP1;
                     position = getY() + diff;
                     this.setY(position);
+                    tempYP1 = endYP1;
                     endYP1 = endYP2;
-                    if(animationController != null) {
-                        animationController.animateOnDrag(getId());
+                    if (dragListener != null) {
+                        dragListener.onDrag(getId());
                     }
-                    float deltaY = event.getRawY() - startY;
-//                    if (Math.abs(deltaY) > mSlop) {
-                        endUnixTime = new Date().getTime();
-                        velocityY = deltaY/((endUnixTime-startUnixTime)/100);
-//                        Log.d(DEBUG_TAG,"Delta: "+deltaY);
-//                        Log.d(DEBUG_TAG,velocityY+"");
-//                    }
-                    return true;
-                case (MotionEvent.ACTION_UP):
-                case (MotionEvent.ACTION_CANCEL):
-                    if ((mMinFlingVelocity <= Math.abs(velocityY) && Math.abs(velocityY) <= mMaxFlingVelocity && this.getY()<-getHeight() / 20)||getY() < -getHeight() / 2) {
-                        if(actionController != null) {
-                            actionController.exitUp(getId());
-                            animationController.animateOnExitUp(getId());
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    if (getY() < -getHeight() / 2) {
+                        if (eventListener != null) {
+                            eventListener.onExitUp(getId());
                         }
                         this.animate()
                                 .translationY(-getHeight())
                                 .setListener(null)
                                 .setDuration(400) //400
                                 .start();
-                    } else if ((mMinFlingVelocity <= Math.abs(velocityY) && Math.abs(velocityY) <= mMaxFlingVelocity && this.getY()>getHeight() / 20)||getY() > getHeight() / 2) {
-                        if(actionController != null) {
-                            actionController.exitDown(getId());
-                            animationController.animateOnExitDown(getId());
+                    } else if (getY() > getHeight() / 2) {
+                        if (eventListener != null) {
+                            eventListener.onExitDown(getId());
                         }
                         this.animate()
                                 .translationY(getHeight())
@@ -176,43 +184,20 @@ public class TrailedSheet extends RelativeLayout {
                                     .setDuration(300)
                                     .start();
                         }
-                        if(animationController != null) {
-                            animationController.animateOnUp(getId());
+                        if (releaseListener != null) {
+                            releaseListener.onUp(getId());
                         }
                     }
-//                if (mIsBeingDragged) {
-//                    final VelocityTracker velocityTracker = mVelocityTracker;
-//                    velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-//                    int initialVelocity = (int) velocityTracker.getXVelocity(mActivePointerId);
-//                    mPopulatePending = true;
-//                    final int width = getClientWidth();
-//                    final int scrollX = getScrollX();
-//                    final ItemInfo ii = infoForCurrentScrollPosition();
-//                    final float marginOffset = (float) mPageMargin / width;
-//                    final int currentPage = ii.position;
-//                    final float pageOffset = (((float) scrollX / width) - ii.offset)
-//                            / (ii.widthFactor + marginOffset);
-//                    final int activePointerIndex = ev.findPointerIndex(mActivePointerId);
-//                    final float x = ev.getX(activePointerIndex);
-//                    final int totalDelta = (int) (x - mInitialMotionX);
-//                    int nextPage = determineTargetPage(currentPage, pageOffset, initialVelocity,
-//                            totalDelta);
-//                    setCurrentItemInternal(nextPage, true, true, initialVelocity);
-//
-//                    needsInvalidate = resetTouch();
-//                }
-//                    Log.d(DEBUG_TAG, "Action was UP || Cancelled");
-                    return true;
-                case (MotionEvent.ACTION_OUTSIDE):
-//                    Log.d(DEBUG_TAG, "Movement occurred outside bounds " +
-//                            "of current screen element");
-                    return true;
+                    break;
                 default:
-                    unlocked = true;
                     return super.onTouchEvent(event);
             }
-        }else {
-            return super.onTouchEvent(event);
+            if(!(getY() < -getHeight() / 2 || getY() > getHeight() / 2)) {
+                gestureDetectorCompat.onTouchEvent(event);
+            }
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -245,11 +230,15 @@ public class TrailedSheet extends RelativeLayout {
      * Animate a push up Event
      * And give user the ability to handle
      */
-
     public void moveUp(){
+        int duration = 400;
+        moveUp(duration);
+    }
+
+    private void moveUp(int duration){
         this.animate()
                 .translationY(-getHeight())
-                .setDuration(400).setListener(new Animator.AnimatorListener() {
+                .setDuration(duration).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
 
@@ -257,8 +246,9 @@ public class TrailedSheet extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if(actionController != null) {
-                    actionController.exitUp(getId());
+                unlock();
+                if(eventListener != null) {
+                    eventListener.onExitUp(getId());
                 }
             }
 
@@ -274,8 +264,8 @@ public class TrailedSheet extends RelativeLayout {
         }).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                if(actionController != null) {
-                    animationController.animateOnExitUp(getId());
+                if(whileAnimating != null) {
+                    whileAnimating.whileAnimatingUp(getId());
                 }
             }
         });
@@ -285,11 +275,15 @@ public class TrailedSheet extends RelativeLayout {
      * Animate a push down Event
      * And give user the ability to handle
      */
-
     public void moveDown(){
+        int duration = 400;
+        moveDown(duration);
+    }
+
+    private void moveDown(int duration){
         this.animate()
                 .translationY(getHeight())
-                .setDuration(400).setListener(new Animator.AnimatorListener() {
+                .setDuration(duration).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
 
@@ -297,8 +291,9 @@ public class TrailedSheet extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if(actionController != null) {
-                    actionController.exitDown(getId());
+                unlock();
+                if(eventListener != null) {
+                    eventListener.onExitDown(getId());
                 }
             }
 
@@ -314,32 +309,38 @@ public class TrailedSheet extends RelativeLayout {
         }).setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                if(animationController != null){
-                    animationController.animateOnExitDown(getId());
+                if(whileAnimating != null){
+                    whileAnimating.whileAnimatingDown(getId());
                 }
             }
         });
     }
 
     /**
-     * set ActionController Interface
-     * @param actionController Action Related Control
+     * set TrailedSheetListeners Interface
+     * @param eventListener a TrailedSheetListeners
      * @return this
      */
-    public TrailedSheet setActionController(ActionController actionController){
-        this.actionController = actionController;
+    public TrailedSheet addEventListener(TrailedSheetListeners.EventListener eventListener){
+        this.eventListener = eventListener;
         return this;
     }
 
-    /**
-     * Set AnimationController Interface
-     * @param animationController Animation Related Control
-     * @return this
-     */
-    public TrailedSheet setAnimationController(AnimationController animationController){
-        this.animationController = animationController;
+    public TrailedSheet addReleaseListener(TrailedSheetListeners.ReleaseListener releaseListener){
+        this.releaseListener = releaseListener;
         return this;
     }
+
+    public TrailedSheet addDragListener(TrailedSheetListeners.DragListener dragListener){
+        this.dragListener = dragListener;
+        return this;
+    }
+
+    public TrailedSheet addWhileAnimatingListener(TrailedSheetListeners.WhileAnimatingListener whileAnimating){
+        this.whileAnimating = whileAnimating;
+        return this;
+    }
+
 
     /**
      * Reset To default Position
@@ -355,4 +356,5 @@ public class TrailedSheet extends RelativeLayout {
             setY(defaultY);
         }
     }
+
 }
