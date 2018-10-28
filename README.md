@@ -18,7 +18,7 @@ allprojects {
 
 ```
 dependencies {
-	compile 'com.github.mohammad-tabbara:trailedsheet:0.0.2'
+	implementation 'com.github.Mohammad-Tabbara:TrailedSheet:1.0'
 }
 ```
 
@@ -39,7 +39,8 @@ dependencies {
 
 ### TouchEvents:
 
-Coming Soon
+Fling Up or down to trigger an EventInterface
+Drag Up or Down If The Drag exceeds half its hieght it will Trigger an EventInterface.
 
 ### In Code(Methods):
 
@@ -51,7 +52,21 @@ trailedSheet.moveUp(); // animates moveup and triggers eventListener Up
 trailedSheet.moveDown(); // animates movedown and triggers eventListener down
 ```
 
+### TrailedSheetListeners:
+
+*ID is the id of the view
+interface EventListener
+    void onExitUp(int id)
+    void onExitDown(int id)
+DragListener:
+    void onDrag(int id)
+ReleaseListener:
+    void onUp(int id)
+WhileAnimatingListener:
+    void whileAnimatingUp(int id)
+    void whileAnimatingDown(int id)
+
 
 ## Future work
 
-Coming Soon
+Drag Orientation. In Xml Attributes.
