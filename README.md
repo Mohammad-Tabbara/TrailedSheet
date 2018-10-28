@@ -39,7 +39,8 @@ dependencies {
 
 ### TouchEvents:
 
-Fling Up or down to trigger an EventInterface
+Fling Up or down to trigger an EventInterface.
+
 Drag Up or Down If The Drag exceeds half its hieght it will Trigger an EventInterface.
 
 ### In Code(Methods):
@@ -55,15 +56,25 @@ trailedSheet.moveDown(); // animates movedown and triggers eventListener down
 ### TrailedSheetListeners:
 
 *ID is the id of the view
-interface EventListener
+
+1. interface EventListener
+
     void onExitUp(int id)
+    
     void onExitDown(int id)
-DragListener:
+    
+2. DragListener:
+
     void onDrag(int id)
-ReleaseListener:
+    
+3. ReleaseListener:
+
     void onUp(int id)
-WhileAnimatingListener:
+    
+4. WhileAnimatingListener:
+
     void whileAnimatingUp(int id)
+    
     void whileAnimatingDown(int id)
 
 
